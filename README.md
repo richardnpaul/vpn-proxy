@@ -14,3 +14,5 @@ IKE Authmode psk
 Xauth username <Username usually from a RADIUS auth service, such as Active Directory>
 Xauth password <Matching Password for the above username>
 ```
+
+Install docker and docker-compose, or docker for desktop and run `docker compose up`/`docker-compose up`
