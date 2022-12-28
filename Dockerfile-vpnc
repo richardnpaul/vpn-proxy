@@ -1,0 +1,9 @@
+FROM debian:11-slim
+
+RUN set -eux; \
+    apt-get update && \
+    apt-get upgrade -y && \
+    apt-get install -y --no-install-recommends vpnc; \
+    rm -rf /var/lib/apt/lists/*
+
+CMD ["vpnc", "/etc/vpnc/local.conf", "--no-detach", "--non-inter", "--local-port", "0"]

@@ -1,0 +1,23 @@
+version: "3"
+services:
+  vpn:
+    build:
+      context: ./
+      dockerfile: Dockerfile-vpnc
+    volumes:
+      - ./vpnc.conf:/etc/vpnc/local.conf
+    restart: always
+    cap_add:
+      - NET_ADMIN
+    ports:
+      - "8080:3128"
+  proxy:
+    build:
+      context: ./
+      dockerfile: Dockerfile-squid
+    restart: always
+    volumes:
+      - ./passwords:/etc/squid/passwords
+    depends_on:
+      - vpn
+    network_mode: "service:vpn"
