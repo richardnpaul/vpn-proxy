@@ -1,23 +1,44 @@
-version: "3"
+---
+version: "3.8"
 services:
   vpn:
+    container_name: vpn
     build:
       context: ./
       dockerfile: Dockerfile-vpnc
     volumes:
       - ./vpnc.conf:/etc/vpnc/local.conf
-    restart: always
+    restart: unless-stopped
     cap_add:
       - NET_ADMIN
     ports:
       - "8080:3128"
+      - "2222:22/tcp"
   proxy:
+    container_name: web-proxy
     build:
       context: ./
       dockerfile: Dockerfile-squid
-    restart: always
+    restart: unless-stopped
     volumes:
       - ./passwords:/etc/squid/passwords
     depends_on:
       - vpn
     network_mode: "service:vpn"
+  bastion:
+    image: binlab/bastion
+    container_name: bastion
+    restart: unless-stopped
+    environment:
+      PUBKEY_AUTHENTICATION: "true"
+      GATEWAY_PORTS: "false"
+      PERMIT_TUNNEL: "false"
+      X11_FORWARDING: "false"
+      TCP_FORWARDING: "true"
+      AGENT_FORWARDING: "true"
+    volumes:
+      - ./authorized_keys:/var/lib/bastion/authorized_keys:ro
+      - bastion:/usr/etc/ssh:rw
+    network_mode: "service:vpn"
+volumes:
+  bastion:
