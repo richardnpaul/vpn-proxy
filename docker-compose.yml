@@ -39,6 +39,8 @@ services:
     volumes:
       - ./authorized_keys:/var/lib/bastion/authorized_keys:ro
       - bastion:/usr/etc/ssh:rw
+    depends_on:
+      - vpn
     network_mode: "service:vpn"
 volumes:
   bastion:
