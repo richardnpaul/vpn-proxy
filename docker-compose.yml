@@ -8,6 +8,12 @@ services:
     container_name: vpn
     cap_add:
       - NET_ADMIN
+    healthcheck:
+      test: '[ "$(curl -Ssk --fail ifconfig.co/)" = "193.62.205.241" ]'
+      interval: 15s
+      retries: 20
+      start_period: 5s
+      timeout: 10s
     ports:
       - "8080:3128"
       - "2222:22/tcp"
@@ -20,13 +26,15 @@ services:
       dockerfile: Dockerfile-squid
     container_name: web-proxy
     depends_on:
-      - vpn
+      #- vpn
+      vpn:
+        condition: service_healthy
     healthcheck:
-      test: ["nc", "-z", "localhost", "3128"]
-      interval: 1m
-      timeout: 15s
-      retries: 5
-      start_period: 60s
+      test: 'nc -z localhost 3128'
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 5s
     network_mode: "service:vpn"
     restart: always
     volumes:
@@ -34,7 +42,9 @@ services:
   bastion:
     container_name: bastion
     depends_on:
-      - vpn
+      #- vpn
+      vpn:
+        condition: service_healthy
     environment:
       PUBKEY_AUTHENTICATION: "true"
       GATEWAY_PORTS: "false"
@@ -43,11 +53,11 @@ services:
       TCP_FORWARDING: "true"
       AGENT_FORWARDING: "true"
     healthcheck:
-      test: ["nc", "-z", "localhost", "22"]
-      interval: 30s
-      timeout: 15s
-      retries: 5
-      start_period: 60s
+      test: 'nc -z localhost 22'
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 5s
     image: binlab/bastion
     network_mode: "service:vpn"
     restart: always
