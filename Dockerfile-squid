@@ -3,7 +3,7 @@ FROM debian:11-slim
 RUN set -eux; \
     apt-get update && \
     apt-get upgrade -y && \
-    apt-get install -y --no-install-recommends squid apache2-utils; \
+    apt-get install -y --no-install-recommends squid apache2-utils netcat; \
     rm -rf /var/lib/apt/lists/*
 
 COPY ./squid.conf /etc/squid/conf.d/local.conf

@@ -6,4 +6,4 @@ RUN set -eux; \
     apt-get install -y --no-install-recommends vpnc; \
     rm -rf /var/lib/apt/lists/*
 
-CMD ["vpnc", "/etc/vpnc/local.conf", "--no-detach", "--non-inter", "--local-port", "0"]
+CMD ["vpnc", "--no-detach", "--non-inter", "--local-port", "0", "/etc/vpnc/local.conf"]

@@ -21,8 +21,14 @@ services:
     container_name: web-proxy
     depends_on:
       - vpn
+    healthcheck:
+      test: ["nc", "-z", "localhost", "3128"]
+      interval: 1m
+      timeout: 15s
+      retries: 5
+      start_period: 60s
     network_mode: "service:vpn"
-    restart: unless-stopped
+    restart: always
     volumes:
       - ./passwords:/etc/squid/passwords
   bastion:
@@ -36,9 +42,15 @@ services:
       X11_FORWARDING: "false"
       TCP_FORWARDING: "true"
       AGENT_FORWARDING: "true"
+    healthcheck:
+      test: ["nc", "-z", "localhost", "22"]
+      interval: 30s
+      timeout: 15s
+      retries: 5
+      start_period: 60s
     image: binlab/bastion
     network_mode: "service:vpn"
-    restart: unless-stopped
+    restart: always
     volumes:
       - ./authorized_keys:/var/lib/bastion/authorized_keys:ro
       - bastion:/usr/etc/ssh:rw
