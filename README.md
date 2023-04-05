@@ -28,3 +28,8 @@ Host my-remote-server.example.com
   User someusername
   ProxyJump bastion@127.0.0.1:2222,someusername@some-other-remote-server.some-region.example.com
 ```
+
+# Kubernetes
+You can change your kubeconfig to use the bastion as a proxy for all clusters.
+* Just add proxy-url key to each cluster in your kubeconfig clusters array
+    - the proxy-url format is `http://<htpassword username>:<password set with htpassword>@127.0.0.1:8080`
