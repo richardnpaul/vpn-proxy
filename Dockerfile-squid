@@ -3,7 +3,7 @@ FROM debian:12-slim
 RUN set -eux; \
     apt-get update && \
     apt-get upgrade -y && \
-    apt-get install -y --no-install-recommends squid netcat-traditional; \
+    apt-get install -y --no-install-recommends squid; \
     rm -rf /var/lib/apt/lists/*
 
 COPY ./squid.conf /etc/squid/conf.d/local.conf
