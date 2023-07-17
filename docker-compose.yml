@@ -7,12 +7,6 @@ services:
     container_name: vpn
     cap_add:
       - NET_ADMIN
-    healthcheck:
-      test: bash -c "ping -c 1 -W 2 1.1.1.1 2>&1 >/dev/null && [ \"$(curl -Ssk --fail ifconfig.co/)\" = \"193.62.205.241\" ]"
-      interval: 15s
-      retries: 20
-      start_period: 5s
-      timeout: 10s
     ports:
       - "8080:3128"
       - "2222:22/tcp"
@@ -25,23 +19,16 @@ services:
       dockerfile: Dockerfile-squid
     container_name: web-proxy
     depends_on:
-      vpn:
-        condition: service_healthy
-    healthcheck:
-      test: bash -c "ping -c 1 -W 2 1.1.1.1 2>&1 >/dev/null && nc -z localhost 3128"
-      interval: 10s
-      timeout: 5s
-      retries: 20
-      start_period: 5s
+      - vpn
     network_mode: "service:vpn"
     restart: always
     volumes:
       - ./passwords:/etc/squid/passwords
   bastion:
+    command: ["/entrypoint.sh", "bastion"]
     container_name: bastion
     depends_on:
-      vpn:
-        condition: service_healthy
+      - vpn
     environment:
       PUBKEY_AUTHENTICATION: "true"
       GATEWAY_PORTS: "false"
@@ -49,17 +36,12 @@ services:
       X11_FORWARDING: "false"
       TCP_FORWARDING: "true"
       AGENT_FORWARDING: "true"
-    healthcheck:
-      test: sh -c "ping -c 1 -W 2 1.1.1.1 2>&1 >/dev/null && nc -z localhost 22"
-      interval: 10s
-      timeout: 5s
-      retries: 20
-      start_period: 5s
     image: binlab/bastion
     network_mode: "service:vpn"
     restart: always
     volumes:
       - ./authorized_keys:/var/lib/bastion/authorized_keys:ro
+      - ./entrypoint.sh:/entrypoint.sh:ro
       - bastion:/usr/etc/ssh:rw
 volumes:
   bastion:

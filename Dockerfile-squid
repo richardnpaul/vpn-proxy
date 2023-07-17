@@ -1,11 +1,12 @@
-FROM debian:11-slim
+FROM debian:12-slim
 
 RUN set -eux; \
     apt-get update && \
     apt-get upgrade -y && \
-    apt-get install -y --no-install-recommends squid apache2-utils netcat iputils-ping; \
+    apt-get install -y --no-install-recommends squid netcat-traditional; \
     rm -rf /var/lib/apt/lists/*
 
 COPY ./squid.conf /etc/squid/conf.d/local.conf
+COPY ./entrypoint.sh /entrypoint.sh
 
-CMD [ "squid", "-N" ]
+CMD [ "/entrypoint.sh", "squid"]
