@@ -28,7 +28,8 @@ You will need to generate the `passwords` file with the `htpasswd` command:
 ```
 htpasswd -c ./passwords <username>
 ```
-This will result in a file with the name `passwords` in the current directory.  The contents of this file will be in the format:
+This will result in a file with the name `passwords` in the current directory _(which is mounted in the proxy container as a volume)_.
+The contents of this file will be in the format:
 ```
 <username>:$apr1$<salt>$<hash>
 ```
